@@ -2,7 +2,10 @@ package state
 
 import (
 	"fmt"
+
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
+	"golang.org/x/term"
 )
 
 type State interface {
@@ -62,6 +65,11 @@ func (l ListState) GetCursor() int {
 }
 
 func (l *ListState) View() string {
+	width, height, err := term.GetSize(0)
+	if err != nil {
+		return ""
+	}
+	innerStyle := lipgloss.NewStyle()
 	s := "What should we buy at the market?\n\n"
 
 	for i, choice := range l.Choices {
@@ -80,6 +88,11 @@ func (l *ListState) View() string {
 	}
 
 	s += "\nPress q to quit.\n"
-	return s
+	mainBlock := innerStyle.Render(s)
+	marginLeft := (width / 2) - (lipgloss.Width(s) / 2)
+	marginTop := (height / 2) - (lipgloss.Height(s) / 2)
+	outerStyle := lipgloss.NewStyle().MarginLeft(marginLeft).MarginTop(marginTop).Render(mainBlock)
+
+	return outerStyle
 
 }
