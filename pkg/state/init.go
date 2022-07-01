@@ -9,7 +9,7 @@ import (
 )
 
 type State interface {
-	Update(msg tea.Msg) tea.Cmd
+	Update(msg tea.Msg, m *Model) tea.Cmd
 	View() string
 }
 type ListState struct {
@@ -18,7 +18,7 @@ type ListState struct {
 	Selected map[int]struct{}
 }
 
-func (l *ListState) Update(msg tea.Msg) tea.Cmd {
+func (l *ListState) Update(msg tea.Msg, m *Model) tea.Cmd {
 
 	switch msg := msg.(type) {
 
@@ -31,6 +31,9 @@ func (l *ListState) Update(msg tea.Msg) tea.Cmd {
 		// These keys should exit the program.
 		case "ctrl+c", "q":
 			return tea.Quit
+
+		case "t":
+			m.AppState = &EditState{}
 
 		// The "up" and "k" keys move the cursor up
 		case "up", "k":
