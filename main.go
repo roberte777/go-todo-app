@@ -8,15 +8,13 @@ import (
 	"github.com/roberte777/go-todo-app/pkg/state"
 )
 
-type State interface{}
-
 type model struct {
 	CurrentState int
-	ListState    state.ListState
+	ListState    state.State
 }
 
 func initialModel() model {
-	state := state.ListState{
+	state := &state.ListState{
 		Choices:  []string{"Buy carrots", "Buy celery", "Buy kohlrabi"},
 		Selected: make(map[int]struct{}),
 		Cursor:   0,

@@ -5,6 +5,10 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+type State interface {
+	Update(msg tea.Msg) tea.Cmd
+	View() string
+}
 type ListState struct {
 	Choices  []string
 	Cursor   int
