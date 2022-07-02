@@ -3,6 +3,7 @@ package state
 import (
 	"fmt"
 
+	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"golang.org/x/term"
@@ -13,7 +14,7 @@ type State interface {
 	View() string
 }
 type ListState struct {
-	Choices  []string
+	ToDoList []string
 	Cursor   int
 	Selected map[int]struct{}
 }
@@ -32,8 +33,12 @@ func (l *ListState) Update(msg tea.Msg, m *Model) tea.Cmd {
 		case "ctrl+c", "q":
 			return tea.Quit
 
-		case "t":
-			m.AppState = &EditState{}
+		case "e":
+			text := textinput.New()
+			text.Focus()
+			text.SetValue(l.ToDoList[l.Cursor])
+			text.CursorEnd()
+			m.AppState = &EditState{content: text}
 
 		// The "up" and "k" keys move the cursor up
 		case "up", "k":
@@ -43,7 +48,7 @@ func (l *ListState) Update(msg tea.Msg, m *Model) tea.Cmd {
 
 		// The "down" and "j" keys move the cursor down
 		case "down", "j":
-			if l.Cursor < len(l.Choices)-1 {
+			if l.Cursor < len(l.ToDoList)-1 {
 				l.Cursor++
 			}
 
@@ -73,9 +78,9 @@ func (l *ListState) View() string {
 		return ""
 	}
 	innerStyle := lipgloss.NewStyle()
-	s := "What should we buy at the market?\n\n"
+	s := "What should I do today??\n\n"
 
-	for i, choice := range l.Choices {
+	for i, choice := range l.ToDoList {
 		cursor := " "
 		if l.GetCursor() == i {
 			cursor = ">"
@@ -98,4 +103,11 @@ func (l *ListState) View() string {
 
 	return outerStyle
 
+}
+func createListState() *ListState {
+	return &ListState{
+		ToDoList: []string{"Beat up Trevor", "Tell Max he is cool", "Do something that scares Satya"},
+		Selected: make(map[int]struct{}),
+		Cursor:   0,
+	}
 }

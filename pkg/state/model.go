@@ -5,17 +5,13 @@ import (
 )
 
 type Model struct {
-	CurrentState int
-	AppState     State
+	AppState  State
+	ListState *ListState
 }
 
 func InitialModel() *Model {
-	state := &ListState{
-		Choices:  []string{"Buy carrots", "Buy celery", "Buy kohlrabi"},
-		Selected: make(map[int]struct{}),
-		Cursor:   0,
-	}
-	return &Model{AppState: state, CurrentState: 0}
+	state := createListState()
+	return &Model{AppState: state, ListState: state}
 }
 func (m Model) Init() tea.Cmd {
 	return nil

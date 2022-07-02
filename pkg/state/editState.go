@@ -1,15 +1,18 @@
 package state
 
-import tea "github.com/charmbracelet/bubbletea"
+import (
+	"fmt"
 
-// type State interface {
-// 	Update(msg tea.Msg, m *Model) tea.Cmd
-// 	View() string
-// }
+	"github.com/charmbracelet/bubbles/textinput"
+	tea "github.com/charmbracelet/bubbletea"
+)
 
-type EditState struct{}
+type EditState struct {
+	content textinput.Model
+}
 
 func (e *EditState) Update(msg tea.Msg, m *Model) tea.Cmd {
+	var cmd tea.Cmd
 	switch msg := msg.(type) {
 
 	// Is it a key press?
@@ -19,20 +22,25 @@ func (e *EditState) Update(msg tea.Msg, m *Model) tea.Cmd {
 		switch msg.String() {
 
 		// These keys should exit the program.
-		case "ctrl+c", "q":
+		case "ctrl+c":
 			return tea.Quit
 
-		case "t":
-			m.AppState = &ListState{}
+		case "ctrl+l":
+			m.AppState = m.ListState
 
 		}
 	}
 
 	// Return the updated model to the Bubble Tea runtime for processing.
 	// Note that we're not returning a command.
-	return nil
+	e.content, cmd = e.content.Update(msg)
+	m.ListState.ToDoList[m.ListState.Cursor] = e.content.Value()
+	return cmd
 }
 
 func (e *EditState) View() string {
-	return ""
+	return fmt.Sprint("testing\n", e.content.View())
+}
+func createEditState(content textinput.Model) *EditState {
+	return &EditState{content: content}
 }
